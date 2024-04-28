@@ -5,7 +5,8 @@ import cors from 'cors';
 //parser
 app.use(express.json());
 app.use(cors());
-app.get('/', (req: Request, res: Response) => {
+const getHelloController = (req: Request, res: Response) => {
   res.send('Hello World');
-});
+};
+app.get('/', getHelloController);
 export default app;
