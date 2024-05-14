@@ -8,8 +8,6 @@ import {
   // StudentModel,
   TUserName,
 } from './student.interface';
-import bcrypt from 'bcrypt';
-import config from '../../app/config';
 const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
@@ -64,11 +62,11 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: [true, 'Student ID is required'],
       unique: true,
     },
-    password: {
-      type: String,
-      required: [true, 'Password is required'],
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'User id is required'],
       unique: true,
-      maxLength: [20, 'password can not be more than 20 characters'],
+      ref: 'User',
     },
     name: {
       type: userNameSchema,
@@ -80,6 +78,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
         values: ['male', 'female'],
         message: '{VALUE} is not valid',
       },
+      required: [true, 'Gender is required'],
     },
     dateOfBirth: { type: String },
     email: {
@@ -115,11 +114,6 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: [true, 'Local Guardian Information is required'],
     },
     profileImg: { type: String },
-    isActive: {
-      type: String,
-      enum: ['active', 'blocked'],
-      default: 'active',
-    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -134,24 +128,6 @@ const studentSchema = new Schema<TStudent, StudentModel>(
 // virtual
 studentSchema.virtual('fullName').get(function () {
   return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
-});
-//pre save middleware hook
-studentSchema.pre('save', async function (next) {
-  //console.log(this, 'pre hook: we will save the data');
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
-  //hashing password and save into DB
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_round),
-  );
-  next();
-});
-
-//post save middleware
-studentSchema.post('save', function (doc, next) {
-  doc.password = '';
-  next();
 });
 
 // Query Middleware
