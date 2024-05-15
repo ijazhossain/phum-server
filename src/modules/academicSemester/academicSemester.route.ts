@@ -17,6 +17,9 @@ router.get(
 );
 router.patch(
   '/:semesterId',
+  validateRequest(
+    AcademicSemesterValidations.updateAcademicSemesterValidationSchema,
+  ),
   AcademicSemesterControllers.updateAcademicSemester,
 );
 
