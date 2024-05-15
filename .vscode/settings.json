@@ -1,7 +1,8 @@
 {
-    "workbench.colorCustomizations": {
-        "activityBar.background": "#06351D",
-        "titleBar.activeBackground": "#084B29",
-        "titleBar.activeForeground": "#EEFDF5"
-    }
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#06351D",
+    "titleBar.activeBackground": "#084B29",
+    "titleBar.activeForeground": "#EEFDF5"
+  },
+  "cSpell.blockCheckingWhenAverageChunkSizeGreaterThan": 50
 }

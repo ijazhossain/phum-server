@@ -78,9 +78,9 @@ const studentSchema = new Schema<TStudent, StudentModel>(
         values: ['male', 'female'],
         message: '{VALUE} is not valid',
       },
-      required: [true, 'Gender is required'],
+      required: [true, 'Gender Name is required'],
     },
-    dateOfBirth: { type: String },
+    dateOfBirth: { type: Date },
     email: {
       type: String,
       required: [true, 'Email is required'],
