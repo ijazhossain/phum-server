@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
 import catchAsync from '../../app/utils/catchAsync';
 import sendResponse from '../../app/utils/sendResponse';
-import { AcademicSemesterServices } from './AcademicSemester.service';
+import { AcademicSemesterServices } from './academicSemester.service';
 
 const createAcademicSemester = catchAsync(async (req, res) => {
   const result = await AcademicSemesterServices.createAcademicSemesterIntoDB(
