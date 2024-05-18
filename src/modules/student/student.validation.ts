@@ -6,6 +6,11 @@ const userNameValidationSchema = z.object({
   middleName: z.string().optional(),
   lastName: z.string().min(1),
 });
+const userNameUpdateValidationSchema = z.object({
+  firstName: z.string().min(1).max(20).optional(),
+  middleName: z.string().optional().optional(),
+  lastName: z.string().min(1).optional(),
+});
 
 const guardianValidationSchema = z.object({
   fatherName: z.string().min(1),
@@ -15,8 +20,22 @@ const guardianValidationSchema = z.object({
   motherOccupation: z.string().min(1),
   motherContactNo: z.string().min(1),
 });
+const guardianUpdateValidationSchema = z.object({
+  fatherName: z.string().min(1).optional(),
+  fatherOccupation: z.string().min(1).optional(),
+  fatherContactNo: z.string().min(1).optional(),
+  motherName: z.string().min(1).optional(),
+  motherOccupation: z.string().min(1).optional(),
+  motherContactNo: z.string().min(1).optional(),
+});
 
 const localGuardianValidationSchema = z.object({
+  name: z.string().min(1),
+  occupation: z.string().min(1),
+  contactNo: z.string().min(1),
+  address: z.string().min(1),
+});
+const localGuardianUpdateValidationSchema = z.object({
   name: z.string().min(1),
   occupation: z.string().min(1),
   contactNo: z.string().min(1),
@@ -35,8 +54,8 @@ const createStudentValidationSchema = z.object({
       bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
       presentAddress: z.string(),
       permanentAddress: z.string(),
-      guardian: guardianValidationSchema,
-      localGuardian: localGuardianValidationSchema,
+      guardian: guardianUpdateValidationSchema.optional(),
+      localGuardian: localGuardianUpdateValidationSchema.optional(),
       admissionSemester: z.string(),
       profileImg: z.string().optional(),
     }),
@@ -46,7 +65,7 @@ const updateStudentValidationSchema = z.object({
   body: z.object({
     password: z.string().max(20).optional(),
     student: z.object({
-      name: userNameValidationSchema.optional(),
+      name: userNameUpdateValidationSchema.optional(),
       gender: z.enum(['male', 'female']).optional(),
       dateOfBirth: z.string().optional(),
       email: z.string().email().optional(),
