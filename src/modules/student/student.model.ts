@@ -8,6 +8,8 @@ import {
   // StudentModel,
   TUserName,
 } from './student.interface';
+import AppError from '../../app/errors/AppError';
+import httpStatus from 'http-status';
 const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
@@ -119,6 +121,11 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: true,
       ref: 'AcademicSemester',
     },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'AcademicDepartment',
+    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -136,18 +143,30 @@ studentSchema.virtual('fullName').get(function () {
 });
 
 // Query Middleware
+
 studentSchema.pre('find', function (next) {
-  // console.log(this);
   this.find({ isDeleted: { $ne: true } });
   next();
 });
-studentSchema.pre('findOne', function (next) {
-  // console.log(this);
-  this.find({ isDeleted: { $ne: true } });
+studentSchema.pre('findOne', async function (next) {
+  //this.find({ isDeleted: { $ne: true } });
+  const query = this.getQuery();
+  const isUserExists = await Student.find({
+    id: query.id,
+    isDeleted: { $ne: true },
+  });
+
+  if (isUserExists.length === 0) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Student does not exists!!!');
+  }
   next();
 });
 studentSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
+});
+studentSchema.pre('findOneAndUpdate', async function (next) {
+  this.find({ isDeleted: { $ne: true } });
   next();
 });
 
@@ -158,7 +177,7 @@ studentSchema.pre('aggregate', function (next) {
   }; */
 //creating a custom static method
 studentSchema.statics.isUserExists = async function (id: string) {
-  const existingUser = await Student.findOne({ id });
+  const existingUser = await Student.findOne({ id, isDeleted: { $ne: true } });
   return existingUser;
 };
 export const Student = model<TStudent, StudentModel>('Student', studentSchema);
