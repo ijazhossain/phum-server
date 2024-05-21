@@ -16,7 +16,7 @@ const academicDepartmentSchema = new Schema({
   },
 });
 
-academicDepartmentSchema.pre('save', async function (next) {
+/* academicDepartmentSchema.pre('save', async function (next) {
   const isDepartmentExist = await AcademicDepartment.findOne({
     name: this.name,
   });
@@ -43,7 +43,7 @@ academicDepartmentSchema.pre('deleteOne', async function (next) {
     throw new AppError(404, 'This department does not exists');
   }
   next();
-});
+}); */
 export const AcademicDepartment = model<TAcademicDepartment>(
   'AcademicDepartment',
   academicDepartmentSchema,
