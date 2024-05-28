@@ -4,8 +4,21 @@ import AppError from '../../app/errors/AppError';
 import httpStatus, { BAD_REQUEST } from 'http-status';
 import { User } from '../user/user.model';
 import { TStudent } from './student.interface';
+import QueryBuilder from '../../app/builder/QueryBuilder';
+import { searchableFields } from './student.constant';
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
+  //
+  const studentQuery = new QueryBuilder(Student.find(), query)
+    .search(searchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+  const result = await studentQuery.modelQuery;
+  return result;
+};
+/* const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   const queryObj = { ...query }; //copy
   const searchableFields = ['email', 'name.firstName', 'presentAddress'];
   let searchTerm = '';
@@ -56,7 +69,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   }
   const fieldQuery = await limitQuery.select(fields);
   return fieldQuery;
-};
+}; */
 const getSingleStudentFromDB = async (id: string) => {
   if (!(await Student.isUserExists(id))) {
     throw new AppError(BAD_REQUEST, 'Student do not found');
