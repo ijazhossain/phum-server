@@ -54,7 +54,6 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
       },
     ];
   } else if (err instanceof Error) {
-    statusCode = err?.statusCode;
     message = err?.message;
     errorSources = [
       {
