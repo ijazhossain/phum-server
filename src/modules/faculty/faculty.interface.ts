@@ -18,6 +18,7 @@ export type TFaculty = {
   id: string;
   user: Types.ObjectId;
   name: TUserName;
+  designation: string;
   gender: TGender;
   dateOfBirth?: string;
   email: string;
@@ -26,8 +27,7 @@ export type TFaculty = {
   bloodGroup: TBloodGroup;
   presentAddress: string;
   permanentAddress: string;
-  profileImg: string;
-  academicFaculty: Types.ObjectId;
+  profileImg?: string;
   academicDepartment: Types.ObjectId;
   isDeleted: boolean;
 };
