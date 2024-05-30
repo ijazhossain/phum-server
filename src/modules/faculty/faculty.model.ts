@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { TFaculty, TUserName } from './faculty.interface';
+import { FacultyModel, TFaculty, TUserName } from './faculty.interface';
 import { BloodGroup, Gender } from './faculty.constant';
 
 const userNameSchema = new Schema<TUserName>({
@@ -82,5 +82,16 @@ const facultySchema = new Schema<TFaculty>(
     timestamps: true,
   },
 );
-
-export const Faculty = model<TFaculty>('Faculty', facultySchema);
+facultySchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+facultySchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+facultySchema.statics.isFacultyExists = async function (id: string) {
+  const existingUser = await Faculty.findOne({ id });
+  return existingUser;
+};
+export const Faculty = model<TFaculty, FacultyModel>('Faculty', facultySchema);

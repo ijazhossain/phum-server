@@ -149,8 +149,8 @@ studentSchema.pre('find', function (next) {
   next();
 });
 studentSchema.pre('findOne', async function (next) {
-  //this.find({ isDeleted: { $ne: true } });
-  const query = this.getQuery();
+  this.find({ isDeleted: { $ne: true } });
+  /* const query = this.getQuery();
   const isUserExists = await Student.find({
     id: query.id,
     isDeleted: { $ne: true },
@@ -158,7 +158,7 @@ studentSchema.pre('findOne', async function (next) {
 
   if (isUserExists.length === 0) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Student does not exists!!!');
-  }
+  } */
   next();
 });
 studentSchema.pre('aggregate', function (next) {
