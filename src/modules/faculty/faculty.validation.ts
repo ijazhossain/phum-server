@@ -6,6 +6,11 @@ const userNameValidationSchema = z.object({
   middleName: z.string().min(1).max(255),
   lastName: z.string().min(1).max(255),
 });
+const updateUserNameValidationSchema = z.object({
+  firstName: z.string().min(1).max(255).optional(),
+  middleName: z.string().min(1).max(255).optional(),
+  lastName: z.string().min(1).max(255).optional(),
+});
 
 const createFacultyValidationSchema = z.object({
   body: z.object({
@@ -31,7 +36,7 @@ const updateFacultyValidationSchema = z.object({
     password: z.string().max(20).optional(),
     faculty: z.object({
       designation: z.string().min(1).max(255).optional(),
-      name: userNameValidationSchema.optional(),
+      name: updateUserNameValidationSchema.optional(),
       gender: z.enum([...Gender] as [string, ...string[]]).optional(),
       dateOfBirth: z.string().optional().optional(),
       email: z.string().email().optional(),

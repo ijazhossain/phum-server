@@ -3,6 +3,7 @@ import AppError from '../../app/errors/AppError';
 import { Faculty } from './faculty.model';
 import { User } from '../user/user.model';
 import mongoose from 'mongoose';
+import { TFaculty } from './faculty.interface';
 
 const getAllFacultiesFromDB = async () => {
   const result = await Faculty.find();
@@ -41,14 +42,41 @@ const deleteSingleFacultyFromDB = async (id: string) => {
     await session.commitTransaction();
     await session.endSession();
     return deletedFaculty;
-  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();
-    console.log(err);
+
+    throw new Error(err);
   }
+};
+const updateSingleFacultyIntoDB = async (
+  id: string,
+  payload: Partial<TFaculty>,
+) => {
+  if (!(await Faculty.isFacultyExists(id))) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Faculty do not found');
+  }
+  const { name, ...remainingFacultyData } = payload;
+  const modifiedUpdateData: Record<string, unknown> = {
+    ...remainingFacultyData,
+  };
+
+  if (name && Object.keys(name).length) {
+    for (const [key, value] of Object.entries(name)) {
+      modifiedUpdateData[`name.${key}`] = value;
+    }
+  }
+
+  const result = await Faculty.updateOne({ id }, modifiedUpdateData, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
 };
 export const FacultyServices = {
   getAllFacultiesFromDB,
   getSingleFacultyFromDB,
   deleteSingleFacultyFromDB,
+  updateSingleFacultyIntoDB,
 };

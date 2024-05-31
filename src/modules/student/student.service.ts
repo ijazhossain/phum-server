@@ -82,7 +82,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
 }; */
 const getSingleStudentFromDB = async (id: string) => {
   if (!(await Student.isUserExists(id))) {
-    throw new AppError(BAD_REQUEST, 'Student do not found');
+    throw new AppError(httpStatus.BAD_REQUEST, 'Student do not found');
   }
   const result = await Student.findOne({ id })
     .populate('admissionSemester')
@@ -99,6 +99,7 @@ const updateSingleStudentIntoDB = async (
   id: string,
   payload: Partial<TStudent>,
 ) => {
+  console.log({ payload });
   if (!(await Student.isUserExists(id))) {
     throw new AppError(BAD_REQUEST, 'Student do not found');
   }
