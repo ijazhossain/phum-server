@@ -99,7 +99,6 @@ const updateSingleStudentIntoDB = async (
   id: string,
   payload: Partial<TStudent>,
 ) => {
-  console.log({ payload });
   if (!(await Student.isUserExists(id))) {
     throw new AppError(BAD_REQUEST, 'Student do not found');
   }
