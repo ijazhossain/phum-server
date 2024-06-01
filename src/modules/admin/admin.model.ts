@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { TAdmin, TAdminName } from './admin.interface';
+import { AdminModel, TAdmin, TAdminName } from './admin.interface';
 import { BloodGroup, Gender } from './admin.constant';
 
 const adminNameSchema = new Schema<TAdminName>({
@@ -74,4 +74,16 @@ const adminSchema = new Schema<TAdmin>(
     timestamps: true,
   },
 );
-export const Admin = model<TAdmin>('Admin', adminSchema);
+adminSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+adminSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+adminSchema.statics.isAdminExists = async function (id: string) {
+  const existingUser = await Admin.findOne({ id });
+  return existingUser;
+};
+export const Admin = model<TAdmin, AdminModel>('Admin', adminSchema);

@@ -7,13 +7,17 @@ const adminNameSchema = z.object({
   middleName: z.string().optional(),
   lastName: z.string(),
 });
+const updateAdminNameSchema = z.object({
+  firstName: z.string().optional(),
+  middleName: z.string().optional(),
+  lastName: z.string().optional(),
+});
 
 // Define the Zod schema for the admin
 const createAdminValidationSchema = z.object({
   body: z.object({
+    password: z.string().max(20).optional(),
     admin: z.object({
-      id: z.string(),
-      user: z.string(),
       name: adminNameSchema,
       gender: z.enum([...Gender] as [string, ...string[]]),
       dateOfBirth: z.string(),
@@ -30,10 +34,8 @@ const createAdminValidationSchema = z.object({
 const updateAdminValidationSchema = z.object({
   body: z.object({
     admin: z.object({
-      id: z.string().optional(),
-      user: z.string().optional(),
-      name: adminNameSchema,
-      gender: z.enum([...Gender] as [string, ...string[]]),
+      name: updateAdminNameSchema.optional(),
+      gender: z.enum([...Gender] as [string, ...string[]]).optional(),
       dateOfBirth: z.string().optional(),
       email: z.string().email('Invalid email format').optional(),
       contactNo: z.string().optional(),
