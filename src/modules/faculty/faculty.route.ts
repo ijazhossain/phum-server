@@ -5,10 +5,10 @@ import { facultyValidations } from './faculty.validation';
 
 const router = Router();
 router.get('/', FacultyControllers.getAllFaculties);
-router.get('/:facultyId', FacultyControllers.getSingleFaculty);
-router.delete('/:facultyId', FacultyControllers.deleteSingleFaculty);
+router.get('/:id', FacultyControllers.getSingleFaculty);
+router.delete('/:id', FacultyControllers.deleteSingleFaculty);
 router.patch(
-  '/:facultyId',
+  '/:id',
   validateRequest(facultyValidations.updateFacultyValidationSchema),
   FacultyControllers.updateSingleFaculty,
 );

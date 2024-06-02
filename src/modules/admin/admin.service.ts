@@ -23,7 +23,6 @@ const getAllAdminsFromDB = async (query: Record<string, unknown>) => {
   // filtering
   const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
   excludeFields.forEach((el) => delete queryObj[el]);
-  console.log({ query, queryObj });
   const filterQuery = searchQuery.find(queryObj);
   let sort = '-createdAt';
   if (query?.sort) {
@@ -55,7 +54,7 @@ const getSingleAdminFromDB = async (id: string) => {
   if (!(await Admin.isAdminExists(id))) {
     throw new AppError(httpStatus.NOT_FOUND, 'Admin does not exists');
   }
-  const result = await Admin.findOne({ id });
+  const result = await Admin.findById(id);
   return result;
 };
 const deleteSingleAdminFromDB = async (id: string) => {
@@ -65,25 +64,27 @@ const deleteSingleAdminFromDB = async (id: string) => {
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    const deletedUser = await User.updateOne(
-      { id },
+    const deletedAdmin = await Admin.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true, session },
+    );
+    if (!deletedAdmin) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Admin');
+    }
+    const userId = deletedAdmin.user;
+    const deletedUser = await User.findByIdAndUpdate(
+      userId,
       { isDeleted: true },
       { new: true, session },
     );
     if (!deletedUser) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
     }
-    const deletedFaculty = await Admin.updateOne(
-      { id },
-      { isDeleted: true },
-      { new: true, session },
-    );
-    if (!deletedFaculty) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Admin');
-    }
+
     await session.commitTransaction();
     await session.endSession();
-    return deletedFaculty;
+    return deletedAdmin;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     await session.abortTransaction();
@@ -110,7 +111,7 @@ const updateSingleAdminIntoDB = async (
     }
   }
 
-  const result = await Admin.updateOne({ id }, modifiedUpdateData, {
+  const result = await Admin.findByIdAndUpdate(id, modifiedUpdateData, {
     new: true,
     runValidators: true,
   });

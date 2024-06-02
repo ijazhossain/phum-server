@@ -137,11 +137,11 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     },
   },
 );
-// virtual
+/* // virtual
 studentSchema.virtual('fullName').get(function () {
   return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
 });
-
+ */
 // Query Middleware
 
 studentSchema.pre('find', function (next) {
@@ -177,7 +177,10 @@ studentSchema.pre('findOneAndUpdate', async function (next) {
   }; */
 //creating a custom static method
 studentSchema.statics.isUserExists = async function (id: string) {
-  const existingUser = await Student.findOne({ id, isDeleted: { $ne: true } });
+  const existingUser = await Student.findOne({
+    _id: id,
+    isDeleted: { $ne: true },
+  });
   return existingUser;
 };
 export const Student = model<TStudent, StudentModel>('Student', studentSchema);

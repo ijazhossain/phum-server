@@ -83,7 +83,7 @@ adminSchema.pre('findOne', function (next) {
   next();
 });
 adminSchema.statics.isAdminExists = async function (id: string) {
-  const existingUser = await Admin.findOne({ id });
+  const existingUser = await Admin.findById(id);
   return existingUser;
 };
 export const Admin = model<TAdmin, AdminModel>('Admin', adminSchema);

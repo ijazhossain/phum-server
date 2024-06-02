@@ -13,9 +13,9 @@ const getAllAdmins = catchAsync(async (req, res) => {
   });
 });
 const getSingleAdmin = catchAsync(async (req, res) => {
-  const { adminId } = req.params;
-
-  const result = await AdminServices.getSingleAdminFromDB(adminId);
+  const { id } = req.params;
+  console.log(id);
+  const result = await AdminServices.getSingleAdminFromDB(id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -24,9 +24,9 @@ const getSingleAdmin = catchAsync(async (req, res) => {
   });
 });
 const deleteSingleAdmin = catchAsync(async (req, res) => {
-  const { adminId } = req.params;
+  const { id } = req.params;
 
-  const result = await AdminServices.deleteSingleAdminFromDB(adminId);
+  const result = await AdminServices.deleteSingleAdminFromDB(id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -35,9 +35,9 @@ const deleteSingleAdmin = catchAsync(async (req, res) => {
   });
 });
 const updateSingleAdmin = catchAsync(async (req, res) => {
-  const { adminId } = req.params;
+  const { id } = req.params;
   const { admin } = req.body;
-  const result = await AdminServices.updateSingleAdminIntoDB(adminId, admin);
+  const result = await AdminServices.updateSingleAdminIntoDB(id, admin);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

@@ -53,7 +53,7 @@ const getSingleFacultyFromDB = async (id: string) => {
   if (!(await Faculty.isFacultyExists(id))) {
     throw new AppError(httpStatus.NOT_FOUND, 'Faculty does not exists');
   }
-  const result = await Faculty.findOne({ id });
+  const result = await Faculty.findById(id);
   return result;
 };
 const deleteSingleFacultyFromDB = async (id: string) => {
@@ -63,22 +63,24 @@ const deleteSingleFacultyFromDB = async (id: string) => {
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    const deletedUser = await User.updateOne(
-      { id },
-      { isDeleted: true },
-      { new: true, session },
-    );
-    if (!deletedUser) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
-    }
-    const deletedFaculty = await Faculty.updateOne(
-      { id },
+    const deletedFaculty = await Faculty.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session },
     );
     if (!deletedFaculty) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete faculty');
     }
+    const userId = deletedFaculty.user;
+    const deletedUser = await User.findByIdAndUpdate(
+      userId,
+      { isDeleted: true },
+      { new: true, session },
+    );
+    if (!deletedUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
+    }
+
     await session.commitTransaction();
     await session.endSession();
     return deletedFaculty;
@@ -108,7 +110,7 @@ const updateSingleFacultyIntoDB = async (
     }
   }
 
-  const result = await Faculty.updateOne({ id }, modifiedUpdateData, {
+  const result = await Faculty.findByIdAndUpdate(id, modifiedUpdateData, {
     new: true,
     runValidators: true,
   });

@@ -6,10 +6,10 @@ import { AdminControllers } from './admin.controller';
 
 const router = Router();
 router.get('/', AdminControllers.getAllAdmins);
-router.get('/:adminId', AdminControllers.getSingleAdmin);
-router.delete('/:adminId', AdminControllers.deleteSingleAdmin);
+router.get('/:id', AdminControllers.getSingleAdmin);
+router.delete('/:id', AdminControllers.deleteSingleAdmin);
 router.patch(
-  '/:adminId',
+  '/:id',
   validateRequest(adminValidations.updateAdminValidationSchema),
   AdminControllers.updateSingleAdmin,
 );

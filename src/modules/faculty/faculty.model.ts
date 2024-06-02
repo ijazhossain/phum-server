@@ -91,7 +91,7 @@ facultySchema.pre('findOne', function (next) {
   next();
 });
 facultySchema.statics.isFacultyExists = async function (id: string) {
-  const existingUser = await Faculty.findOne({ id });
+  const existingUser = await Faculty.findById(id);
   return existingUser;
 };
 export const Faculty = model<TFaculty, FacultyModel>('Faculty', facultySchema);
