@@ -8,8 +8,6 @@ import {
   // StudentModel,
   TUserName,
 } from './student.interface';
-import AppError from '../../app/errors/AppError';
-import httpStatus from 'http-status';
 const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
