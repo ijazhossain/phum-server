@@ -30,7 +30,7 @@ const getAllFacultiesFromDB = async (query: Record<string, unknown>) => {
   const sortQuery = filterQuery.sort(sort);
   //limit
   let page = 1;
-  let limit = 1;
+  let limit = 10;
   let skip = 0;
   if (query.limit) {
     limit = Number(query.limit);
