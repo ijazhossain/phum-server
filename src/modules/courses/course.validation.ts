@@ -19,7 +19,13 @@ const updateCourseValidationSchema = z.object({
     preRequisiteCourses: z.array(PreRequisiteCourseValidationSchema).optional(),
   }),
 });
+export const facultiesWithCourseValidationSchema = z.object({
+  body: z.object({
+    faculties: z.array(z.string()),
+  }),
+});
 export const CourseValidations = {
   createCourseValidationSchema,
   updateCourseValidationSchema,
+  facultiesWithCourseValidationSchema,
 };

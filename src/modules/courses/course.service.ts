@@ -1,7 +1,10 @@
+import httpStatus from 'http-status';
 import QueryBuilder from '../../app/builder/QueryBuilder';
+import AppError from '../../app/errors/AppError';
 import { CourseSearchableFields } from './course.constant';
-import { TCourse } from './course.interface';
-import { Course } from './course.model';
+import { TCourse, TCourseFaculty } from './course.interface';
+import { Course, CourseFaculty } from './course.model';
+import mongoose from 'mongoose';
 
 const createCourseIntoDB = async (payload: TCourse) => {
   const result = await Course.create(payload);
@@ -34,11 +37,83 @@ const deleteCourseFromDB = async (id: string) => {
 };
 const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
   const { preRequisiteCourses, ...courseRemaining } = payload;
-  const updateBasicInfo = await Course.findByIdAndUpdate(id, courseRemaining, {
-    new: true,
-    runValidators: true,
-  });
-  return updateBasicInfo;
+  const session = await mongoose.startSession();
+  try {
+    //   Basic course info update
+    session.startTransaction();
+    const updateBasicCourseInfo = await Course.findByIdAndUpdate(
+      id,
+      courseRemaining,
+      {
+        new: true,
+        runValidators: true,
+        session,
+      },
+    );
+    if (!updateBasicCourseInfo) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+    }
+    //   check if there is any prerequisite course to update
+    if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+      // filter out the deleted fields
+      const deletedPreRequisites = preRequisiteCourses
+        .filter((el) => el.course && el.isDeleted)
+        .map((el) => el.course);
+
+      // remove deleted courses
+      const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(id, {
+        $pull: {
+          preRequisiteCourses: { course: { $in: deletedPreRequisites } },
+        },
+      });
+      if (!deletedPreRequisiteCourses) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+      }
+      // Filter out the new courses
+      const newPreRequisites = preRequisiteCourses?.filter(
+        (el) => el.course && !el.isDeleted,
+      );
+
+      const newPreRequisiteCourses = await Course.findByIdAndUpdate(
+        id,
+        {
+          $addToSet: {
+            preRequisiteCourses: { $each: newPreRequisites },
+          },
+        },
+        { new: true, runValidators: true, session },
+      );
+      if (!newPreRequisiteCourses) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+      }
+    }
+    await session.commitTransaction();
+    await session.endSession();
+    const result = await Course.findById(id).populate(
+      'preRequisiteCourses.course',
+    );
+    return result;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+};
+const assignFacultiesWithCourseIntoDB = async (
+  id: string,
+  payload: Partial<TCourseFaculty>,
+) => {
+  const result = await CourseFaculty.findByIdAndUpdate(
+    id,
+    { course: id, $addToSet: { faculties: { $each: payload } } },
+    {
+      upsert: true,
+      new: true,
+      runValidators: true,
+    },
+  );
+  return result;
 };
 export const CourseServices = {
   createCourseIntoDB,
@@ -46,4 +121,5 @@ export const CourseServices = {
   getSingleCoursesFromDB,
   deleteCourseFromDB,
   updateCourseIntoDB,
+  assignFacultiesWithCourseIntoDB,
 };
