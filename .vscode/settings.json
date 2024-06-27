@@ -4,5 +4,6 @@
     "titleBar.activeBackground": "#084B29",
     "titleBar.activeForeground": "#EEFDF5"
   },
-  "cSpell.blockCheckingWhenAverageChunkSizeGreaterThan": 50
+  "cSpell.blockCheckingWhenAverageChunkSizeGreaterThan": 50,
+  "cSpell.words": ["datetime"]
 }
