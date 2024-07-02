@@ -175,7 +175,7 @@ const deleteOfferedCourseFromDB = async (id: string) => {
   const result = await OfferedCourse.findByIdAndDelete(id);
   return result;
 };
-export const OfferedCourseControllers = {
+export const OfferedCourseServices = {
   createOfferedCourseIntoDB,
   updateOfferedCourseIntoDB,
   getAllOfferedCoursesFromDB,
