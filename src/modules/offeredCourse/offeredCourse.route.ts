@@ -18,4 +18,4 @@ router.patch(
 router.get('/', OfferedCourseControllers.getAllOfferedCourses);
 router.get('/:id', OfferedCourseControllers.getSingleOfferedCourse);
 router.delete('/:id', OfferedCourseControllers.deleteOfferedCourse);
-export const offeredCourseRoutes = router;
+export const OfferedCourseRoutes = router;
