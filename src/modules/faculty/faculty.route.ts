@@ -2,9 +2,10 @@ import { Router } from 'express';
 import { FacultyControllers } from './faculty.controller';
 import validateRequest from '../../app/middlewares/validateRequest';
 import { facultyValidations } from './faculty.validation';
+import auth from '../../app/utils/auth';
 
 const router = Router();
-router.get('/', FacultyControllers.getAllFaculties);
+router.get('/', auth(), FacultyControllers.getAllFaculties);
 router.get('/:id', FacultyControllers.getSingleFaculty);
 router.delete('/:id', FacultyControllers.deleteSingleFaculty);
 router.patch(
