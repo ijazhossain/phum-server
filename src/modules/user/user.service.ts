@@ -111,12 +111,11 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   userData.email = payload.email;
   const session = await mongoose.startSession();
   try {
-    console.log('hi admin');
     session.startTransaction();
     userData.id = await generateAdminId();
 
     const newUser = await User.create([userData], { session });
-    console.log({ newUser });
+
     if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user');
     }
