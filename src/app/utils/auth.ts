@@ -78,15 +78,6 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     // check the jwt issue before password change
-    console.log(
-      'check',
-      User.isJWTIssuedBeforePasswordChanged(
-        user?.passwordChangedAt as Date,
-        iat as number,
-      ),
-    );
-
-    // check the jwt issue before password change
     if (
       user.passwordChangedAt &&
       User.isJWTIssuedBeforePasswordChanged(

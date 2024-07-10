@@ -5,13 +5,14 @@ import catchAsync from '../../app/utils/catchAsync';
 
 const loginUser = catchAsync(async (req, res) => {
   const result = await AuthServices.loginUser(req.body);
-  const { accessToken, needsPasswordChange } = result;
+  const { accessToken, refreshToken, needsPasswordChange } = result;
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'User is logged in successfully!',
     data: {
       accessToken,
+      refreshToken,
       needsPasswordChange,
     },
   });
