@@ -5,5 +5,5 @@
     "titleBar.activeForeground": "#EEFDF5"
   },
   "cSpell.blockCheckingWhenAverageChunkSizeGreaterThan": 50,
-  "cSpell.words": ["datetime"]
+  "cSpell.words": ["cloudinary", "datetime"]
 }
