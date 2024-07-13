@@ -84,7 +84,7 @@ const createStudentIntoDB = async (
 const createFacultyIntoDB = async (
   file: any,
   password: string,
-  payload: TStudent,
+  payload: TFaculty,
 ) => {
   console.log(payload);
   const userData: Partial<TUser> = {};
@@ -132,7 +132,7 @@ const createFacultyIntoDB = async (
 const createAdminIntoDB = async (
   file: any,
   password: string,
-  payload: TStudent,
+  payload: TAdmin,
 ) => {
   console.log(payload.email);
   // create an user object
