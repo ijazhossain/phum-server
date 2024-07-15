@@ -7,6 +7,9 @@ import { Student } from '../student/student.model';
 import mongoose from 'mongoose';
 import { Course } from '../courses/course.model';
 import { SemesterRegistration } from '../semesterRegistration/semesterRegistration.model';
+import { Faculty } from '../faculty/faculty.model';
+import QueryBuilder from '../../app/builder/QueryBuilder';
+import { calculateGradeAndPoints } from './enrolledCourse.utils';
 
 const createEnrolledCourseIntoDB = async (
   userId: string,
@@ -79,7 +82,7 @@ const createEnrolledCourseIntoDB = async (
   //console.log(enrolledCourses);
   const totalCredits =
     enrolledCourses.length > 0 ? enrolledCourses[0].totalEnrolledCredits : 0;
-  console.log(totalCredits);
+  //console.log(totalCredits);
   const semesterRegistration = await SemesterRegistration.findById(
     isOfferedCourseExists.semesterRegistration,
   ).select('maxCredit');
@@ -135,9 +138,139 @@ const createEnrolledCourseIntoDB = async (
     throw new Error(err);
   }
 };
-const getAllEnrolledCoursesFromDB = async () => {};
-const getMyEnrolledCoursesFromDB = async () => {};
-const updateEnrolledCourseMarksIntoDB = async () => {};
+const getAllEnrolledCoursesFromDB = async (
+  facultyId: string,
+  query: Record<string, unknown>,
+) => {
+  const faculty = await Faculty.findOne({ id: facultyId });
+  if (!faculty) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Faculty not found !');
+  }
+  const enrolledCourseQuery = new QueryBuilder(
+    EnrolledCourse.find({
+      faculty: faculty._id,
+    }).populate(
+      'semesterRegistration academicSemester academicFaculty academicDepartment offeredCourse course student faculty',
+    ),
+    query,
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+  const result = await enrolledCourseQuery.modelQuery;
+  const meta = await enrolledCourseQuery.countTotal();
+  return {
+    meta,
+    result,
+  };
+};
+const getMyEnrolledCoursesFromDB = async (
+  studentId: string,
+  query: Record<string, unknown>,
+) => {
+  const student = await Student.findOne({ id: studentId });
+
+  if (!student) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Student not found !');
+  }
+
+  const enrolledCourseQuery = new QueryBuilder(
+    EnrolledCourse.find({ student: student._id }).populate(
+      'semesterRegistration academicSemester academicFaculty academicDepartment offeredCourse course student faculty',
+    ),
+    query,
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await enrolledCourseQuery.modelQuery;
+  const meta = await enrolledCourseQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+const updateEnrolledCourseMarksIntoDB = async (
+  facultyId: string,
+  payload: Partial<TEnrolledCourse>,
+) => {
+  const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
+  const isSemesterRegistrationExists =
+    await SemesterRegistration.findById(semesterRegistration);
+
+  if (!isSemesterRegistrationExists) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'Semester registration not found !',
+    );
+  }
+
+  const isOfferedCourseExists = await OfferedCourse.findById(offeredCourse);
+
+  if (!isOfferedCourseExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Offered course not found !');
+  }
+  const isStudentExists = await Student.findById(student);
+
+  if (!isStudentExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Student not found !');
+  }
+
+  const faculty = await Faculty.findOne({ id: facultyId }, { _id: 1 });
+
+  if (!faculty) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Faculty not found !');
+  }
+
+  const isCourseBelongToFaculty = await EnrolledCourse.findOne({
+    semesterRegistration,
+    offeredCourse,
+    student,
+    faculty: faculty._id,
+  });
+
+  if (!isCourseBelongToFaculty) {
+    throw new AppError(httpStatus.FORBIDDEN, 'You are forbidden! !');
+  }
+  const modifiedData: Record<string, unknown> = {
+    ...courseMarks,
+  };
+  if (courseMarks?.finalTerm) {
+    const { classTest1, classTest2, midTerm, finalTerm } =
+      isCourseBelongToFaculty.courseMarks;
+
+    const totalMarks =
+      Math.ceil(classTest1) +
+      Math.ceil(midTerm) +
+      Math.ceil(classTest2) +
+      Math.ceil(finalTerm);
+
+    const result = calculateGradeAndPoints(totalMarks);
+
+    modifiedData.grade = result.grade;
+    modifiedData.gradePoints = result.gradePoints;
+    modifiedData.isCompleted = true;
+  }
+  if (courseMarks && Object.keys(courseMarks).length) {
+    for (const [key, value] of Object.entries(courseMarks)) {
+      modifiedData[`courseMarks.${key}`] = value;
+    }
+  }
+
+  const result = await EnrolledCourse.findByIdAndUpdate(
+    isCourseBelongToFaculty._id,
+    modifiedData,
+    {
+      new: true,
+    },
+  );
+
+  return result;
+};
 export const EnrolledCourseServices = {
   createEnrolledCourseIntoDB,
   getAllEnrolledCoursesFromDB,
