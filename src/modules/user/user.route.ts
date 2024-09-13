@@ -42,6 +42,7 @@ router.post(
     req.body = JSON.parse(req.body.data);
     next();
   },
+
   validateRequest(adminValidations.createAdminValidationSchema),
   UserControllers.createAdmin,
 );

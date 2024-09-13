@@ -134,7 +134,7 @@ const createAdminIntoDB = async (
   password: string,
   payload: TAdmin,
 ) => {
-  console.log(payload.email);
+  console.log(payload);
   // create an user object
   const userData: Partial<TUser> = {};
   userData.password = password || (config.default_pass as string);
@@ -162,7 +162,7 @@ const createAdminIntoDB = async (
     payload.user = newUser[0]._id;
     const newAdmin = await Admin.create([payload], { session });
     if (!newAdmin.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create faculty');
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create admin');
     }
     await session.commitTransaction();
     await session.endSession();

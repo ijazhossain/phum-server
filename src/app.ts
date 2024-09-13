@@ -13,12 +13,17 @@ import cookieParser from 'cookie-parser';
 //parser
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: ['http://localhost:5173'] }));
+app.use(
+  cors({
+    origin: ['http://localhost:5173', 'http://localhost:5174'],
+    credentials: true,
+  }),
+);
 //application routes
 app.use('/api/v1', router);
 
 const test = (req: Request, res: Response) => {
-  res.send('Hello World');
+  res.send('Phuni server is running!');
 };
 app.get('/', test);
 

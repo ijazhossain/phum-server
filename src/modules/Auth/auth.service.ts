@@ -34,7 +34,7 @@ const loginUser = async (payload: TLoginUser) => {
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
-    config.jwt_refresh_expires_in as string,
+    config.jwt_access_expires_in as string,
   );
   const refreshToken = createToken(
     jwtPayload,
@@ -88,7 +88,6 @@ const changePassword = async (
   return null;
 };
 const refreshToken = async (token: string) => {
-  console.log({ token });
   // checking if the given token is valid
   const decoded = jwt.verify(
     token,
@@ -167,7 +166,7 @@ const forgetPassword = async (userId: string) => {
   const resetToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
-    '10m',
+    config.jwt_access_expires_in as string,
   );
   const resetUILink = `${config.reset_password_ui_link}?id=${user.id}&token=${resetToken}`;
   sendEmail(user.email, resetUILink);
