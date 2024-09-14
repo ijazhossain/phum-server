@@ -28,7 +28,7 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     role: {
       type: String,
-      enum: ['student', 'faculty', 'admin'],
+      enum: ['superAdmin', 'student', 'faculty', 'admin'],
     },
     status: {
       type: String,
@@ -46,11 +46,10 @@ const userSchema = new Schema<TUser, UserModel>(
 );
 //pre save middleware hook
 userSchema.pre('save', async function (next) {
-  //console.log(this, 'pre hook: we will save the data');
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
   //hashing password and save into DB
-  console.log(user.password);
+
   user.password = await bcrypt.hash(
     user.password,
     Number(config.bcrypt_salt_round),
@@ -80,7 +79,7 @@ userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
 ) {
   const passwordChangedTime =
     new Date(passwordChangedTimestamp).getTime() / 1000;
-  //console.log(passwordChangedTime > jwtIssuedTimestamp);
+
   return passwordChangedTime > jwtIssuedTimestamp;
 };
 
