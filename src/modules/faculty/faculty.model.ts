@@ -38,6 +38,7 @@ const facultySchema = new Schema<TFaculty>(
     },
     email: {
       type: String,
+      unique: true,
       required: [true, 'Faculty email is required'],
     },
     contactNo: {
@@ -72,6 +73,10 @@ const facultySchema = new Schema<TFaculty>(
       type: Schema.Types.ObjectId,
       required: [true, 'Academic Department is required'],
       ref: 'AcademicDepartment',
+    },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicFaculty',
     },
     isDeleted: {
       type: Boolean,

@@ -17,6 +17,7 @@ const adminSchema = new Schema<TAdmin>(
     user: {
       type: Schema.Types.ObjectId,
       required: [true, 'User id is required'],
+      unique: true,
       ref: 'User',
     },
     name: {
@@ -37,6 +38,7 @@ const adminSchema = new Schema<TAdmin>(
     },
     email: {
       type: String,
+      unique: true,
       required: [true, 'Admin email is required'],
     },
     contactNo: {
