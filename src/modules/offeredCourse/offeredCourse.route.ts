@@ -13,13 +13,36 @@ router.post(
   validateRequest(OfferedCourseValidations.createOfferedCourseValidationSchema),
   OfferedCourseControllers.createOfferedCourse,
 );
+
+router.get(
+  '/',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin, USER_ROLE.faculty),
+  OfferedCourseControllers.getAllOfferedCourses,
+);
+router.get(
+  '/my-offered-courses',
+  auth(USER_ROLE.student),
+  OfferedCourseControllers.getMyOfferedCourses,
+);
+router.get(
+  '/:id',
+  auth(
+    USER_ROLE.superAdmin,
+    USER_ROLE.admin,
+    USER_ROLE.faculty,
+    USER_ROLE.student,
+  ),
+  OfferedCourseControllers.getSingleOfferedCourse,
+);
 router.patch(
   '/:id',
   auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   validateRequest(OfferedCourseValidations.updateOfferedCourseValidationSchema),
   OfferedCourseControllers.updateOfferedCourse,
 );
-router.get('/', OfferedCourseControllers.getAllOfferedCourses);
-router.get('/:id', OfferedCourseControllers.getSingleOfferedCourse);
-router.delete('/:id', OfferedCourseControllers.deleteOfferedCourse);
+router.delete(
+  '/:id',
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  OfferedCourseControllers.deleteOfferedCourse,
+);
 export const OfferedCourseRoutes = router;

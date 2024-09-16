@@ -199,6 +199,7 @@ const updateEnrolledCourseMarksIntoDB = async (
   payload: Partial<TEnrolledCourse>,
 ) => {
   const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
+  console.log(courseMarks);
   const isSemesterRegistrationExists =
     await SemesterRegistration.findById(semesterRegistration);
 
