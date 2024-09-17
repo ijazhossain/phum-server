@@ -4,8 +4,10 @@ import { Faculty } from './faculty.model';
 import { User } from '../user/user.model';
 import mongoose from 'mongoose';
 import { TFaculty } from './faculty.interface';
+import QueryBuilder from '../../app/builder/QueryBuilder';
+import { FacultySearchableFields } from './faculty.constant';
 
-const getAllFacultiesFromDB = async (query: Record<string, unknown>) => {
+/* const getAllFacultiesFromDB = async (query: Record<string, unknown>) => {
   const queryObj = { ...query };
   const searchableFields = ['email', 'name.firstName', 'presentAddress'];
   let searchTerm = '';
@@ -48,6 +50,24 @@ const getAllFacultiesFromDB = async (query: Record<string, unknown>) => {
   }
   const fieldsQuery = await limitQuery.select(fields);
   return fieldsQuery;
+}; */
+const getAllFacultiesFromDB = async (query: Record<string, unknown>) => {
+  const facultyQuery = new QueryBuilder(
+    Faculty.find().populate('academicDepartment academicFaculty'),
+    query,
+  )
+    .search(FacultySearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await facultyQuery.modelQuery;
+  const meta = await facultyQuery.countTotal();
+  return {
+    meta,
+    result,
+  };
 };
 const getSingleFacultyFromDB = async (id: string) => {
   if (!(await Faculty.isFacultyExists(id))) {

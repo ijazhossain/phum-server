@@ -4,8 +4,10 @@ import { User } from '../user/user.model';
 import mongoose from 'mongoose';
 import { Admin } from './admin.model';
 import { TAdmin } from './admin.interface';
+import QueryBuilder from '../../app/builder/QueryBuilder';
+import { AdminSearchableFields } from './admin.constant';
 
-const getAllAdminsFromDB = async (query: Record<string, unknown>) => {
+/* const getAllAdminsFromDB = async (query: Record<string, unknown>) => {
   const queryObj = { ...query }; //copy
   // {email:{$regex:query.searchTerm, $options:'i'}}
   // {presentAddress:{$regex:query.searchTerm, $options:'i'}}
@@ -49,6 +51,21 @@ const getAllAdminsFromDB = async (query: Record<string, unknown>) => {
   }
   const fieldQuery = await limitQuery.select(fields);
   return fieldQuery;
+}; */
+const getAllAdminsFromDB = async (query: Record<string, unknown>) => {
+  const adminQuery = new QueryBuilder(Admin.find(), query)
+    .search(AdminSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await adminQuery.modelQuery;
+  const meta = await adminQuery.countTotal();
+  return {
+    result,
+    meta,
+  };
 };
 const getSingleAdminFromDB = async (id: string) => {
   if (!(await Admin.isAdminExists(id))) {

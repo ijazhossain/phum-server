@@ -9,12 +9,13 @@ const getAllAdmins = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Admins are retrieved successfully',
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 const getSingleAdmin = catchAsync(async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+  // console.log(id);
   const result = await AdminServices.getSingleAdminFromDB(id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -42,6 +43,7 @@ const updateSingleAdmin = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Admin is updated successfully',
+
     data: result,
   });
 });
