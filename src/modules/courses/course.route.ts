@@ -42,7 +42,6 @@ router.get(
     USER_ROLE.faculty,
     USER_ROLE.student,
   ),
-  validateRequest(CourseValidations.facultiesWithCourseValidationSchema),
   CourseControllers.getFacultiesWithCourse,
 );
 router.delete(
